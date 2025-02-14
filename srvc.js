@@ -49,6 +49,10 @@ function RTCCallback(e) {
 
     switch (e.type) {
         // RTC Events
+        case 'negotiationneeded':
+            rtcLog.innerText = `RTC negotiation needed. Sending offer..\n` + rtcLog.innerText;
+            break;
+            
         case 'track':
             rtcLog.innerText = `Incoming Media Stream...\n` + rtcLog.innerText;
             document.getElementById('remote').srcObject = e.streams[0];
