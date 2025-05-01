@@ -5,7 +5,7 @@ The application uses Web RTC to establish a peer-to-peer connection between user
 
 # Important
 
-- Please replace the SERVICE_ID and OWNER_ID in the `srvc.js` file with your own values.
+- Please replace the SERVICE_ID and OWNER_ID in the `service.js` file with your own values.
 You can get these values by signing up, and creating your own service on [Skapi](https://www.skapi.com).
 
-- Web RTC requires a secure connection (HTTPS) to work. Host `index.html` and `srvc.js` in a https environment.
+- Web RTC requires a secure connection (HTTPS) to work. Host `index.html` and `service.js` in a https environment.

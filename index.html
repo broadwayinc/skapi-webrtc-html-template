@@ -1,139 +1,47 @@
+<!--
+    index.html is the first page your user will see when they visit your website.
+-->
 <!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<head>
-    <title>Skapi Realtime Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/style-blank@latest/blank.css">
-    <script  src="https://cdn.jsdelivr.net/npm/skapi-js@latest/dist/skapi.js"></script>
-    <script src="./srvc.js"></script>
-</head>
+<!--
+    Following <script> tag will import skapi.js.
+-->
+<script src="https://cdn.jsdelivr.net/npm/skapi-js@latest/dist/skapi.js"></script>
 
-<body>
-    <dialog id="el_dl_calling">
-    </dialog>
-    <dialog id="el_dl_incoming">
-    </dialog>
-
-    <h1>Skapi Realtime Example <button id='el_bt_logout' style='vertical-align: bottom;' onclick="skapi.logout()"
-            hidden>Logout</button></h1>
-
-    <form id='el_form_login' onsubmit="skapi.login(event)" hidden>
-        <p>Login:</p>
-        <input type="text" placeholder='login@email.com' name="email">
-        <input type="password" placeholder='password' name="password">
-        <button type="submit">Login</button>
-    </form>
-
-    <br>
-
-    <hr>
-
-    <h1>Connection Info</h1>
-    <pre id="pre_connectionInfo"></pre>
-
-    <br>
-
-    <hr>
-
-    <h1>User Profile</h1>
-    <pre id="el_pre_userProfile"></pre>
-
-    <br>
-
-    <button onclick="
-        skapi.getUsers()
-            .then(u=>document.getElementById('el_pre_userList').innerText=JSON.stringify(u.list, null, 2))
-            .catch(err=>alert(err.message));
-        ">Get User List</button>
-
-    <button onclick="document.getElementById('el_pre_userList').innerHTML = ''">Clear</button>
-
-    <pre id="el_pre_userList"></pre>
-
-    <br>
-
-    <hr>
-
-    <h1>Connect P2P</h1>
-
-    <form onsubmit="callRTC(event)" id="el_form_rtcSettings">
-        <input type="text" placeholder='User ID' name="cid" id="el_input_rtcTarget">
-        <input type="submit" value="Connect">
-        <button type="button" id="el_bt_disconnect" onclick="rtcConnection ? rtcConnection.hangup() : null"
-            disabled>Disconnect</button>
-        <br><br>
-        <label>
-            Audio
-            <input type="checkbox" name="media[audio]">
-        </label><br>
-        <label>
-            Video
-            <input type="checkbox" name="media[video]">
-        </label>
-        <br><br>
-        Data Channel Settings:
-        <br><br>
-        <label>
-            - Ordered
-            <input type="checkbox" name="channels[0][ordered]" checked>
-        </label>
-        <br>
-        <label>
-            - MaxPacketLifeTime&nbsp;
-            <input type="number" name="channels[0][maxPacketLifeTime]" value="10">
-        </label>
-    </form>
-
-    <br>
-
-    <form id='el_form_sendRTCMessage'
-        onsubmit="event.preventDefault(); rtcConnection.channels.default.send(document.getElementById('el_input_rtcMessage').value)">
-        <input type="text" id='el_input_rtcMessage' placeholder='Send RTC Message' name="message" disabled>
-        <input type="submit" value="Send" disabled>
-    </form>
-
-    <br>
-    <br>
-
-    <style>
-        video {
-            width: 320px;
-            height: 240px;
-            border: 1px solid black;
-        }
-    </style>
-
-    <video id="local" autoplay muted></video>
-    <video id="remote" autoplay></video>
-
-    <br>
-
-    <pre id="el_pre_rtcLog"></pre>
-
-</body>
+<!--
+    Import the service.js code that contains your initialization of Skapi class.
+-->
+<script src="service.js"></script>
 
 <script>
-    let call = null;
-    async function callRTC(event) {
-        call = await skapi.connectRTC(event, RTCCallback);
-
-        document.getElementById('el_dl_calling').innerHTML = /*html*/`
-                <p>Calling</p>
-                <button onclick="call.hangup()">Hangup</button>
-            `;
-
-        document.getElementById('el_dl_calling').showModal();
-        rtcConnection = await call.connection;
-        console.log(rtcConnection);
-        if (!rtcConnection) {
-            alert('Call rejected.');
+    /*
+        Check if the user is logged in.
+        If the user is logged in, redirect the user to welcome page.
+    */
+    skapi.getProfile().then(user => {
+        if (user) {
+            location.href = 'welcome.html';
         }
-        if (rtcConnection.media) {
-            document.getElementById('local').srcObject = rtcConnection.media;
-        }
-    }
-
-    skapi.getConnectionInfo().then(res => {
-        document.getElementById('pre_connectionInfo').innerText = JSON.stringify(res, null, 2);
     });
 </script>
+
+<main style="max-width: 640px; margin: auto;">
+    <h1>Index</h1>
+    <p>
+        This is a HTML example for building webRTC video chat application using <a href='https://www.skapi.com'>Skapi</a>.
+        <br>
+        No fancy CSS is used in this example.
+        <br>
+        <br>
+        This project demonstrate basic webRTC features such as:
+        <ul>
+            <li>RTC text messaging</li>
+            <li>RTC video chat</li>
+        </ul>
+        Users can login to chat with others. Authentication part is simplified to just two pages - login.html and signup.html.
+    </p>
+    <a href="login.html">Login</a>
+    |
+    <a href="signup.html">Sign-Up</a>
+</main>

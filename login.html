@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/skapi-js@latest/dist/skapi.js"></script>
+<script src="service.js"></script>
+
+<script>
+    /*
+        Check if the user is logged in.
+        If the user is logged in, redirect the user to welcome page.
+    */
+    skapi.getProfile().then(user => {
+        if (user) {
+            location.href = 'welcome.html';
+        }
+    });
+</script>
+<main style="max-width: 640px; margin: auto;">
+    <a href="index.html">Back</a>
+
+    <h1>Login</h1>
+
+    <form action='welcome.html' onsubmit="skapi.login(event).catch(err => alert(err.message))">
+        <table>
+            <tr>
+                <td>Email</td>
+                <td>
+                    <input name="email" placeholder='your@email.com' required>
+                </td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td>
+                    <input type="password" name="password" minlength="6" placeholder='At least 6 characters' required>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td style="text-align:right">
+                    <small><a href="signup.html">Don't have an account?</a></small>
+                    <br>
+                    <br>
+                    <input type="submit" value="Login">
+                </td>
+            </tr>
+        </table>
+    </form>
+</main>
