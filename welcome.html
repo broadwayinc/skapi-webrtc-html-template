@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script src="https://cdn.jsdelivr.net/npm/skapi-js@latest/dist/skapi.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skapi-js@1.0.242/dist/skapi.js"></script>
 
 <script src="service.js"></script>
 
@@ -12,11 +12,11 @@
 </dialog>
 
 <script>
-    let call = null;
-    let rtcConnection = null;
-    let receiver = null;
-    let participants = {};
-    let cidList = {};
+    let call = null; // Calling object. This is assigned when the user is calling someone.
+    let receiver = null; // Receiver object. This is assigned when the user is receiving a call.
+    let rtcConnection = null; // Resolved RTC connection. This is assigned when the user is connected with a user via RTC.
+    let participants = {}; // Participants object. This is used to cache user information of the available participants in the list.
+    let cidList = {}; // Connection ID list. This is used to cache the connection ID of the participants in the list.
 </script>
 
 <main style="width: 700px; margin: auto; max-width: 100%;">
@@ -49,62 +49,64 @@
 
     <h1>Connect WebRTC</h1>
 
-    <label>
-        <input type="checkbox" id="allow_video" checked> Allow Video
-    </label>
-    <label>
-        <input type="checkbox" id="allow_audio" checked> Allow Audio
-    </label>
-
-    <br><br>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th style="text-align: right;">Connection ID</th>
-            </tr>
-        </thead>
-        <style>
-            table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-
-            th,
-            td {
-                padding: 8px;
-                text-align: left;
-                border-bottom: 1px solid #ddd;
-            }
-
-            tr:hover {
-                background-color: #f5f5f5;
-            }
-
-            th {
-                background-color: #4CAF50;
-                color: white;
-            }
-
-            tr:nth-child(even) {
-                background-color: #f2f2f2;
-            }
-
-            tr:nth-child(odd) {
-                background-color: #ffffff;
-            }
-        </style>
-        <tbody id="RealtimeParticipants">
-            <!-- Realtime participants will be displayed here -->
-        </tbody>
-    </table>
+    <section id="el_dl_calllist">
+        <label>
+            <input type="checkbox" id="allow_video" checked> Allow Video
+        </label>
+        <label>
+            <input type="checkbox" id="allow_audio" checked> Allow Audio
+        </label>
+    
+        <br><br>
+    
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th style="text-align: right;">Connection ID</th>
+                </tr>
+            </thead>
+            <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+    
+                th,
+                td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                }
+    
+                tr:hover {
+                    background-color: #f5f5f5;
+                }
+    
+                th {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+    
+                tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
+    
+                tr:nth-child(odd) {
+                    background-color: #ffffff;
+                }
+            </style>
+            <tbody id="RealtimeParticipants">
+                <!-- Available realtime participants will be displayed here -->
+            </tbody>
+        </table>
+    </section>
 
     <br>
 
     <section style="text-align: center;" id="el_video_call" hidden>
         <video id="local" autoplay muted></video>
-        <video id="remote" autoplay></video>
+        <video id="remote" autoplay muted></video>
 
         <style>
             video {
@@ -115,8 +117,7 @@
             }
         </style>
 
-        <br>
-        <br>
+        <br><br>
 
         <form
             onsubmit="event.preventDefault(); rtcConnection.channels.default.send(document.getElementById('el_input_rtcMessage').value); this.reset();">
@@ -126,10 +127,11 @@
 
         <br>
 
-        <button type="button" onclick="rtcConnection ? rtcConnection.hangup() : null">Disconnect</button>
+        <button type="button" onclick="rtcConnection.hangup()">Disconnect</button>
     </section>
 
     <h1>Websocket Log</h1>
+    <button type="button" onclick="document.getElementById('el_pre_rtcLog').innerText = ''">Clear</button>
     <pre id="el_pre_rtcLog"></pre>
 
     <style>
@@ -138,54 +140,17 @@
         }
 
         #el_pre_rtcLog {
-            height: 200px;
+            height: 320px;
             border: solid 1px;
         }
     </style>
 
 </main>
 <script>
-    async function addCallList(user_id, cid) {
-        if (user_id === skapi.user.user_id) {
-            // If the user is the current user, return the current user info.
-            participants[user_id] = skapi.user;
-            return skapi.user;
-        }
-
-        if (cidList[cid] && participants[user_id]) {
-            // If the user info is already fetched, return it.
-            return participants[user_id];
-        }
-        else {
-            let user = participants[user_id];
-            if (!user) {
-                user = (await skapi.getUsers({ searchFor: 'user_id', value: user_id })).list?.[0];
-                participants[user_id] = user;
-            }
-
-            let RealtimeParticipants = document.getElementById("RealtimeParticipants");
-            let username = `${user.name || user.email || user.user_id}`;
-
-            RealtimeParticipants.innerHTML += /*html*/`
-                <tr id="el_tr_participant-${cid}">
-                    <td>
-                        <strong>${username}</strong>
-                    </td>
-                    <td style="text-align: right;">
-                        ${cid}
-                        <button type="button" onclick="callRTC('${cid}').catch(err=>alert(err.message))">Call</button>
-                    </td>
-                </tr>
-            `;
-            cidList[cid] = user_id;
-        }
-
-        return participants[user_id];
-    }
-
     function RTCCallback(e) {
         let rtcLog = document.getElementById('el_pre_rtcLog'); // RTC Log
 
+        console.log('RTC Callback:', e);
         switch (e.type) {
             // RTC Events
             case 'negotiationneeded':
@@ -195,16 +160,26 @@
             case 'track':
                 rtcLog.innerText += `Incoming Media Stream...\n`;
                 document.getElementById('remote').srcObject = e.streams[0];
+                document.getElementById('remote').play();
                 break;
 
             case 'connectionstatechange':
                 let state = e.state;
                 rtcLog.innerText += `RTC Connection:${e.type}:${state}\n` + JSON.stringify(e, null, 2) + '\n-\n';
-                if (state === 'disconnected' || state === 'failed' || state === 'closed') {
-                    setCallUI(false);
+                document.getElementById('el_dl_calling').close();
+                document.getElementById('el_dl_incoming').close();
+
+                let videoCallSection = document.getElementById('el_video_call');
+                let callList = document.getElementById('el_dl_calllist')
+                if (state === 'disconnected' || state === 'failed' || state === 'closed') {    
+                    videoCallSection.hidden = true;
+                    callList.hidden = false;
                 }
                 else if (state === 'connecting') {
-                    setCallUI(true);
+                    // Callback executed when the user is connected to the server.
+                    el_pre_rtcLog.innerText += 'Connected\n';
+                    videoCallSection.hidden = false;
+                    callList.hidden = true;
                 }
                 break;
 
@@ -216,6 +191,7 @@
                 rtcLog.innerText += `Data Channel:${e.target.label}:${e.type}\n` + JSON.stringify(e.data, null, 2) + '\n-\n';
                 break;
             case 'open':
+                // Data Channel opened
             case 'bufferedamountlow':
             case 'error':
                 rtcLog.innerText += `Data Channel:${e.target.label}:${e.type}\n` + JSON.stringify(e, null, 2) + '\n-\n';
@@ -251,23 +227,43 @@
         }
         if (rtcConnection.media) {
             document.getElementById('local').srcObject = rtcConnection.media;
+            document.getElementById('local').play();
         }
     }
 
-    function setCallUI(state) {
-        document.getElementById('el_dl_calling').close();
-        document.getElementById('el_dl_incoming').close();
+    async function addCallList(user_id, cid) {
+        if (user_id === skapi.user.user_id) {
+            // If the user is the current user, return the current user info, and do not add to the list.
+            participants[user_id] = skapi.user;
+            return skapi.user;
+        }
 
-        if (state) {
-            // Callback executed when the user is connected to the server.
-            el_pre_rtcLog.innerText += 'Connected\n';
-            el_video_call.hidden = false;
+        let user = participants[user_id];
+        if (!user) {
+            user = (await skapi.getUsers({ searchFor: 'user_id', value: user_id })).list?.[0];
+            participants[user_id] = user;
         }
-        else {
-            el_video_call.hidden = true;
-        }
+
+        let RealtimeParticipants = document.getElementById("RealtimeParticipants");
+        let username = `${user.name || user.email || user.user_id}`;
+
+        // add the user to the list with the connection id and the call button
+        RealtimeParticipants.innerHTML += /*html*/`
+            <tr id="el_tr_participant-${cid}">
+                <td>
+                    <strong>${username}</strong>
+                </td>
+                <td id="el_call-button-${cid}" style="text-align: right;">
+                    ${cid}
+                    <button type="button" onclick="callRTC('${cid}').catch(err=>alert(err.message))">Call</button>
+                </td>
+            </tr>
+        `;
+        cidList[cid] = user_id;
+
+        return participants[user_id];
     }
-
+    
     function realtimeCallback(rt) {
         console.log({ rt });
 
@@ -317,18 +313,15 @@
                             rtcConnection = rtc;
                             if(rtc.media) {
                                 document.getElementById("local").srcObject = rtc.media;
+                                document.getElementById("local").play();
                             }
                         })
                 '>Accept</button>
 
-                <button onclick="receiver.hangup();setCallUI(false)">Reject</button>
+                <button onclick="receiver.hangup();">Reject</button>
             `;
 
             dl_incoming.showModal();
-        }
-
-        else if (rt.type === 'rtc:closed') {
-            setCallUI(false);
         }
     }
 
