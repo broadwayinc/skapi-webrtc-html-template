@@ -6,6 +6,7 @@ Users must login to request or receive video calls.
 
 This example features:
 
+- List available receivers
 - Requesting video call
 - Receive incomming video call
 - Hangup incomming, outgoing calls
