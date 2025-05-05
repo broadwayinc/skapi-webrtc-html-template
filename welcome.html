@@ -51,7 +51,8 @@
 
     <label>
         <input type="checkbox" id="allow_video" checked> Allow Video
-        <br>
+    </label>
+    <label>
         <input type="checkbox" id="allow_audio" checked> Allow Audio
     </label>
 
@@ -120,7 +121,7 @@
         <form
             onsubmit="event.preventDefault(); rtcConnection.channels.default.send(document.getElementById('el_input_rtcMessage').value); this.reset();">
             <input type="text" id='el_input_rtcMessage' placeholder='Send RTC Message' name="message">
-            <input type="submit" value="Send" disabled>
+            <input type="submit" value="Send">
         </form>
 
         <br>
@@ -144,7 +145,7 @@
 
 </main>
 <script>
-    async function getUserInfo(user_id, cid) {
+    async function addCallList(user_id, cid) {
         if (user_id === skapi.user.user_id) {
             // If the user is the current user, return the current user info.
             participants[user_id] = skapi.user;
@@ -286,7 +287,7 @@
             let user_id = rt.sender;
 
             if (['USER_LEFT', 'USER_DISCONNECTED'].includes(rt.code)) {
-                // remove the user from the participants list
+                // remove the user from the call list
                 console.log('User left:', rt.sender_cid);
                 document.getElementById(`el_tr_participant-${rt.sender_cid}`)?.remove();
                 delete participants[rt.sender];
@@ -294,7 +295,7 @@
             }
             else if (rt.code === 'USER_JOINED') {
                 // Add the user to the participants list
-                getUserInfo(user_id, rt.sender_cid);
+                addCallList(user_id, rt.sender_cid);
             }
         }
 
@@ -338,7 +339,7 @@
             res.list = res.list.filter(p => p.user_id !== skapi.user.user_id); // remove current user from the list
             console.log('Group Participant:', res); // [{user_id: 'user_a', cid: 'user_cid'}, ...]
             if (res.list.length) {
-                res.list.map(p => getUserInfo(p.user_id, p.cid));
+                res.list.map(p => addCallList(p.user_id, p.cid));
             }
         });
     }
