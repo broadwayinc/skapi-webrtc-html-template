@@ -12,20 +12,13 @@ This example features:
 
 All the main code is in **welcome.html**
 
-## Recommeded VSCode Extention
+## Recommended VSCode Extention
 
 For HTML projects we often tend to use element.innerHTML.
 
 So we recommend installing innerHTML string highlighting extention like one below:
 
 [es6-string-html](https://marketplace.visualstudio.com/items/?itemName=Tobermory.es6-string-html)
-
-
-## Download
-
-Download the full project [Here](https://github.com/broadwayinc/skapi-webrtc-html-template/archive/refs/heads/main.zip)
-
-Or visit our [Github page](https://github.com/broadwayinc/skapi-webrtc-html-template)
 
 
 ## How To Run
