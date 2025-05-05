@@ -36,4 +36,4 @@ let options = {
     }
 }
 
-const skapi = new Skapi(SERVICE_ID, OWNER_ID, options, {network_logs: true});
+const skapi = new Skapi(SERVICE_ID, OWNER_ID, options);

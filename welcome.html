@@ -149,8 +149,8 @@
 <script>
     function RTCCallback(e) {
         let rtcLog = document.getElementById('el_pre_rtcLog'); // RTC Log
-
         console.log('RTC Callback:', e);
+        
         switch (e.type) {
             // RTC Events
             case 'negotiationneeded':
@@ -263,10 +263,8 @@
 
         return participants[user_id];
     }
-    
-    function realtimeCallback(rt) {
-        console.log({ rt });
 
+    function realtimeCallback(rt) {
         let log = rt;
         try {
             log = JSON.stringify(log, null, 2);
@@ -277,14 +275,12 @@
         el_pre_rtcLog.innerText += rt.type + ':\n' + log + '\n-\n';
         // scroll to bottom
         el_pre_rtcLog.scrollTop = el_pre_rtcLog.scrollHeight;
-        console.log({code: rt.code});
         if (rt.type === 'notice') {
             // User joined the group
             let user_id = rt.sender;
 
             if (['USER_LEFT', 'USER_DISCONNECTED'].includes(rt.code)) {
                 // remove the user from the call list
-                console.log('User left:', rt.sender_cid);
                 document.getElementById(`el_tr_participant-${rt.sender_cid}`)?.remove();
                 delete participants[rt.sender];
                 delete cidList[rt.sender_cid];
@@ -309,7 +305,6 @@
                         }
                     }, RTCCallback)
                         .then(rtc => {
-                            console.log(rtc);
                             rtcConnection = rtc;
                             if(rtc.media) {
                                 document.getElementById("local").srcObject = rtc.media;
@@ -330,7 +325,6 @@
     function getRealtimeUsers(refresh) {
         skapi.getRealtimeUsers({ group: 'RTCCall' }).then(res => {
             res.list = res.list.filter(p => p.user_id !== skapi.user.user_id); // remove current user from the list
-            console.log('Group Participant:', res); // [{user_id: 'user_a', cid: 'user_cid'}, ...]
             if (res.list.length) {
                 res.list.map(p => addCallList(p.user_id, p.cid));
             }
@@ -338,7 +332,6 @@
     }
 
     skapi.joinRealtime({ group: 'RTCCall' }).then(r => {
-        console.log('Realtime Group:', r);
         getRealtimeUsers();
     }); // Join a realtime group
 </script>
