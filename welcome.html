@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="main.css" />
 <script src="https://cdn.jsdelivr.net/npm/skapi-js@1.0.242/dist/skapi.js"></script>
 
 <script src="service.js"></script>
 
-<dialog id="el_dl_calling">
-</dialog>
-<dialog id="el_dl_incoming">
-</dialog>
+<dialog id="el_dl_calling"></dialog>
+<dialog id="el_dl_incoming"></dialog>
 
 <script>
     let call = null; // Calling object. This is assigned when the user is calling someone.
@@ -19,23 +18,25 @@
     let cidList = {}; // Connection ID list. This is used to cache the connection ID of the participants in the list.
 </script>
 
-<main style="width: 700px; margin: auto; max-width: 100%;">
-    <section>
-        <h1>Login Success</h1>
-        <p id="WelcomeMessage"></p>
-        <pre style='max-width: 100%; overflow-x: auto;' id="UserInfo"></pre>
-        <button onclick="skapi.logout().then(()=>location.href = 'index.html')">Logout</button>
-    </section>
+<main>
+    <h1>Login Success</h1>
+    <p id="WelcomeMessage"></p>
+    <pre style="max-width: 100%; overflow-x: auto" id="UserInfo"></pre>
+    <button onclick="skapi.logout().then(()=>location.href = 'index.html')">
+        Logout
+    </button>
 
     <script>
         /*
             Get user profile and display it on the page.
         */
-        skapi.getProfile().then(u => {
+        skapi.getProfile().then((u) => {
             if (u) {
                 let welcomeMessage = document.getElementById("WelcomeMessage");
                 if (welcomeMessage) {
-                    welcomeMessage.innerHTML = `Welcome, ${u.name || u.email || u.user_id}!`;
+                    welcomeMessage.innerHTML = `Welcome, ${
+                        u.name || u.email || u.user_id
+                    }!`;
                 }
 
                 let userInfo = document.getElementById("UserInfo");
@@ -47,23 +48,22 @@
         });
     </script>
 
-    <h1>Connect WebRTC</h1>
-
     <section id="el_dl_calllist">
+        <h1>Connect WebRTC</h1>
         <label>
-            <input type="checkbox" id="allow_video" checked> Allow Video
+            <input type="checkbox" id="allow_video" checked /> Allow Video
         </label>
         <label>
-            <input type="checkbox" id="allow_audio" checked> Allow Audio
+            <input type="checkbox" id="allow_audio" checked /> Allow Audio
         </label>
-    
-        <br><br>
-    
+
+        <br /><br />
+
         <table>
             <thead>
                 <tr>
                     <th>Username</th>
-                    <th style="text-align: right;">Connection ID</th>
+                    <th style="text-align: right">Connection ID</th>
                 </tr>
             </thead>
             <style>
@@ -71,27 +71,27 @@
                     border-collapse: collapse;
                     width: 100%;
                 }
-    
+
                 th,
                 td {
                     padding: 8px;
                     text-align: left;
                     border-bottom: 1px solid #ddd;
                 }
-    
+
                 tr:hover {
                     background-color: #f5f5f5;
                 }
-    
+
                 th {
-                    background-color: #4CAF50;
+                    background-color: #4caf50;
                     color: white;
                 }
-    
+
                 tr:nth-child(even) {
                     background-color: #f2f2f2;
                 }
-    
+
                 tr:nth-child(odd) {
                     background-color: #ffffff;
                 }
@@ -102,9 +102,9 @@
         </table>
     </section>
 
-    <br>
+    <br />
 
-    <section style="text-align: center;" id="el_video_call" hidden>
+    <section style="text-align: center" id="el_video_call" hidden>
         <video id="local" autoplay muted></video>
         <video id="remote" autoplay muted></video>
 
@@ -117,21 +117,34 @@
             }
         </style>
 
-        <br><br>
+        <br /><br />
 
         <form
-            onsubmit="event.preventDefault(); rtcConnection.channels.default.send(document.getElementById('el_input_rtcMessage').value); this.reset();">
-            <input type="text" id='el_input_rtcMessage' placeholder='Send RTC Message' name="message">
-            <input type="submit" value="Send">
+            onsubmit="event.preventDefault(); rtcConnection.channels.default.send(document.getElementById('el_input_rtcMessage').value); this.reset();"
+        >
+            <input
+                type="text"
+                id="el_input_rtcMessage"
+                placeholder="Send RTC Message"
+                name="message"
+            />
+            <input type="submit" value="Send" />
         </form>
 
-        <br>
+        <br />
 
-        <button type="button" onclick="rtcConnection.hangup()">Disconnect</button>
+        <button type="button" onclick="rtcConnection.hangup()">
+            Disconnect
+        </button>
     </section>
 
     <h1>Websocket Log</h1>
-    <button type="button" onclick="document.getElementById('el_pre_rtcLog').innerText = ''">Clear</button>
+    <button
+        type="button"
+        onclick="document.getElementById('el_pre_rtcLog').innerText = ''"
+    >
+        Clear
+    </button>
     <pre id="el_pre_rtcLog"></pre>
 
     <style>
@@ -141,60 +154,76 @@
 
         #el_pre_rtcLog {
             height: 320px;
-            border: solid 1px;
+            border: solid 1px #ccc;
+            border-radius: 8px;
+            padding: 16px;
         }
     </style>
-
 </main>
 <script>
     function RTCCallback(e) {
-        let rtcLog = document.getElementById('el_pre_rtcLog'); // RTC Log
-        console.log('RTC Callback:', e);
-        
+        let rtcLog = document.getElementById("el_pre_rtcLog"); // RTC Log
+        console.log("RTC Callback:", e);
+
         switch (e.type) {
             // RTC Events
-            case 'negotiationneeded':
+            case "negotiationneeded":
                 rtcLog.innerText += `RTC negotiation needed. Sending offer..\n`;
                 break;
 
-            case 'track':
+            case "track":
                 rtcLog.innerText += `Incoming Media Stream...\n`;
-                document.getElementById('remote').srcObject = e.streams[0];
-                document.getElementById('remote').play();
+                document.getElementById("remote").srcObject = e.streams[0];
+                document.getElementById("remote").play();
                 break;
 
-            case 'connectionstatechange':
+            case "connectionstatechange":
                 let state = e.state;
-                rtcLog.innerText += `RTC Connection:${e.type}:${state}\n` + JSON.stringify(e, null, 2) + '\n-\n';
-                document.getElementById('el_dl_calling').close();
-                document.getElementById('el_dl_incoming').close();
+                rtcLog.innerText +=
+                    `RTC Connection:${e.type}:${state}\n` +
+                    JSON.stringify(e, null, 2) +
+                    "\n-\n";
+                document.getElementById("el_dl_calling").close();
+                document.getElementById("el_dl_incoming").close();
 
-                let videoCallSection = document.getElementById('el_video_call');
-                let callList = document.getElementById('el_dl_calllist')
-                if (state === 'disconnected' || state === 'failed' || state === 'closed') {    
+                let videoCallSection = document.getElementById("el_video_call");
+                let callList = document.getElementById("el_dl_calllist");
+                if (
+                    state === "disconnected" ||
+                    state === "failed" ||
+                    state === "closed"
+                ) {
                     videoCallSection.hidden = true;
                     callList.hidden = false;
-                }
-                else if (state === 'connecting') {
+                } else if (state === "connecting") {
                     // Callback executed when the user is connected to the server.
-                    el_pre_rtcLog.innerText += 'Connected\n';
+                    el_pre_rtcLog.innerText += "Connected\n";
                     videoCallSection.hidden = false;
                     callList.hidden = true;
                 }
                 break;
 
             // Data Channel Events
-            case 'close':
-                rtcLog.innerText += `Data Channel:${e.target.label}:${e.type}\n` + JSON.stringify(e, null, 2) + '\n-\n';
+            case "close":
+                rtcLog.innerText +=
+                    `Data Channel:${e.target.label}:${e.type}\n` +
+                    JSON.stringify(e, null, 2) +
+                    "\n-\n";
                 break;
-            case 'message':
-                rtcLog.innerText += `Data Channel:${e.target.label}:${e.type}\n` + JSON.stringify(e.data, null, 2) + '\n-\n';
+            case "message":
+                rtcLog.innerText +=
+                    `Data Channel:${e.target.label}:${e.type}\n` +
+                    JSON.stringify(e.data, null, 2) +
+                    "\n-\n";
                 break;
-            case 'open':
-                // Data Channel opened
-            case 'bufferedamountlow':
-            case 'error':
-                rtcLog.innerText += `Data Channel:${e.target.label}:${e.type}\n` + JSON.stringify(e, null, 2) + '\n-\n';
+            case "open":
+            // Data Channel opened
+            case "bufferedamountlow":
+            case "error":
+                rtcLog.innerText +=
+                    `Data Channel:${e.target.label}:${e.type}\n` +
+                    JSON.stringify(e, null, 2) +
+                    "\n-\n";
                 break;
         }
         // scroll to bottom
@@ -206,28 +235,28 @@
 
         let params = {
             media: {
-                audio: document.getElementById('allow_audio').checked,
-                video: document.getElementById('allow_video').checked
+                audio: document.getElementById("allow_audio").checked,
+                video: document.getElementById("allow_video").checked,
             },
             cid,
         };
 
         call = await skapi.connectRTC(params, RTCCallback);
 
-        document.getElementById('el_dl_calling').innerHTML = /*html*/`
+        document.getElementById("el_dl_calling").innerHTML = /*html*/ `
                 <p>Calling</p>
                 <button onclick="call.hangup()">Hangup</button>
             `;
 
-        document.getElementById('el_dl_calling').showModal();
+        document.getElementById("el_dl_calling").showModal();
         rtcConnection = await call.connection;
 
         if (!rtcConnection) {
-            alert('Call rejected.');
+            alert("Call rejected.");
         }
         if (rtcConnection.media) {
-            document.getElementById('local').srcObject = rtcConnection.media;
-            document.getElementById('local').play();
+            document.getElementById("local").srcObject = rtcConnection.media;
+            document.getElementById("local").play();
         }
     }
 
@@ -240,15 +269,19 @@
 
         let user = participants[user_id];
         if (!user) {
-            user = (await skapi.getUsers({ searchFor: 'user_id', value: user_id })).list?.[0];
+            user = (
+                await skapi.getUsers({ searchFor: "user_id", value: user_id })
+            ).list?.[0];
             participants[user_id] = user;
         }
 
-        let RealtimeParticipants = document.getElementById("RealtimeParticipants");
+        let RealtimeParticipants = document.getElementById(
+            "RealtimeParticipants"
+        );
         let username = `${user.name || user.email || user.user_id}`;
 
         // add the user to the list with the connection id and the call button
-        RealtimeParticipants.innerHTML += /*html*/`
+        RealtimeParticipants.innerHTML += /*html*/ `
             <tr id="el_tr_participant-${cid}">
                 <td>
                     <strong>${username}</strong>
@@ -268,34 +301,33 @@
         let log = rt;
         try {
             log = JSON.stringify(log, null, 2);
-        }
-        catch (err) {
-        }
+        } catch (err) {}
 
-        el_pre_rtcLog.innerText += rt.type + ':\n' + log + '\n-\n';
+        el_pre_rtcLog.innerText += rt.type + ":\n" + log + "\n-\n";
         // scroll to bottom
         el_pre_rtcLog.scrollTop = el_pre_rtcLog.scrollHeight;
-        if (rt.type === 'notice') {
+        if (rt.type === "notice") {
             // User joined the group
             let user_id = rt.sender;
 
-            if (['USER_LEFT', 'USER_DISCONNECTED'].includes(rt.code)) {
+            if (["USER_LEFT", "USER_DISCONNECTED"].includes(rt.code)) {
                 // remove the user from the call list
-                document.getElementById(`el_tr_participant-${rt.sender_cid}`)?.remove();
+                document
+                    .getElementById(`el_tr_participant-${rt.sender_cid}`)
+                    ?.remove();
                 delete participants[rt.sender];
                 delete cidList[rt.sender_cid];
-            }
-            else if (rt.code === 'USER_JOINED') {
+            } else if (rt.code === "USER_JOINED") {
                 // Add the user to the participants list
                 addCallList(user_id, rt.sender_cid);
             }
         }
 
-        if (rt.type === 'rtc:incoming') {
+        if (rt.type === "rtc:incoming") {
             receiver = rt;
-            let dl_incoming = document.getElementById('el_dl_incoming');
+            let dl_incoming = document.getElementById("el_dl_incoming");
             // Show incoming call dialog
-            dl_incoming.innerHTML = /*html*/`
+            dl_incoming.innerHTML = /*html*/ `
                 <p>Incoming call</p>
                 <button onclick='
                     receiver.connectRTC({
@@ -323,15 +355,15 @@
     skapi.connectRealtime(realtimeCallback);
 
     function getRealtimeUsers(refresh) {
-        skapi.getRealtimeUsers({ group: 'RTCCall' }).then(res => {
-            res.list = res.list.filter(p => p.user_id !== skapi.user.user_id); // remove current user from the list
+        skapi.getRealtimeUsers({ group: "RTCCall" }).then((res) => {
+            res.list = res.list.filter((p) => p.user_id !== skapi.user.user_id); // remove current user from the list
             if (res.list.length) {
-                res.list.map(p => addCallList(p.user_id, p.cid));
+                res.list.map((p) => addCallList(p.user_id, p.cid));
             }
         });
     }
 
-    skapi.joinRealtime({ group: 'RTCCall' }).then(r => {
+    skapi.joinRealtime({ group: "RTCCall" }).then((r) => {
         getRealtimeUsers();
     }); // Join a realtime group
 </script>
