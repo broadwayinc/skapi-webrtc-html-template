@@ -44,10 +44,19 @@ h1 {
 
 section,
 form {
-    /* max-width: 400px; */
+    max-width: 400px;
     margin: 0 auto;
 }
 
-form {
-    max-width: 400px;
+dialog {
+    border: 1px solid #222;
+    border-radius: 8px;
+}
+
+.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
 }

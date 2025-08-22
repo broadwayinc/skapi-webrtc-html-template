@@ -19,12 +19,10 @@
 </script>
 
 <main>
-    <h1>Login Success</h1>
-    <p id="WelcomeMessage"></p>
-    <pre style="max-width: 100%; overflow-x: auto" id="UserInfo"></pre>
-    <button onclick="skapi.logout().then(()=>location.href = 'index.html')">
-        Logout
-    </button>
+    <div class="flex-wrap">
+        <h1 id="WelcomeMessage"></h1>
+        <a href="logout.html">Logout</a>
+    </div>
 
     <script>
         /*
@@ -138,14 +136,16 @@
         </button>
     </section>
 
-    <h1>Websocket Log</h1>
-    <button
-        type="button"
-        onclick="document.getElementById('el_pre_rtcLog').innerText = ''"
-    >
-        Clear
-    </button>
-    <pre id="el_pre_rtcLog"></pre>
+    <section>
+        <h1>Websocket Log</h1>
+        <button
+            type="button"
+            onclick="document.getElementById('el_pre_rtcLog').innerText = ''"
+        >
+            Clear
+        </button>
+        <pre id="el_pre_rtcLog"></pre>
+    </section>
 
     <style>
         pre {
@@ -288,7 +288,7 @@
                 </td>
                 <td id="el_call-button-${cid}" style="text-align: right;">
                     ${cid}
-                    <button type="button" onclick="callRTC('${cid}').catch(err=>alert(err.message))">Call</button>
+                    <button type="button" onclick="callRTC('${cid}').catch(err=>alert(err.message))" style="width: fit-content">Call</button>
                 </td>
             </tr>
         `;
