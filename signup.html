@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="main.css" />
 <script src="https://cdn.jsdelivr.net/npm/skapi-js@latest/dist/skapi.js"></script>
 
 <script src="service.js"></script>
@@ -8,48 +9,45 @@
         Check if the user is logged in.
         If the user is logged in, redirect the user to welcome page.
     */
-    skapi.getProfile().then(user => {
+    skapi.getProfile().then((user) => {
         if (user) {
-            location.href = 'welcome.html';
+            location.href = "welcome.html";
         }
     });
 </script>
 
-<main style="max-width: 640px; margin: auto;">
+<main>
     <a href="index.html">Back</a>
 
-    <h1>Sign Up</h1>
-    <form action='login.html' onsubmit="
+    <form
+        action="login.html"
+        onsubmit="
         skapi.signup(event).catch(err => alert(err.message) );
-    ">
-        <table>
-            <tr>
-                <td>Login Email</td>
-                <td>
-                    <input name="email" placeholder='your@email.com' required>
-                </td>
-            </tr>
-            <tr>
-                <td>Set Password</td>
-                <td>
-                    <input type="password" name="password" minlength="6" placeholder='At least 6 characters' required>
-                </td>
-            </tr>
-            <tr>
-                <td>Your Name</td>
-                <td>
-                    <input name="name" placeholder='Your name (required)' required>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td style="text-align:right">
-                    <small><a href="login.html">Already have an account?</a></small>
-                    <br>
-                    <br>
-                    <input type="submit" value="Sign Up">
-                </td>
-            </tr>
-        </table>
+    "
+    >
+        <h1>Sign Up</h1>
+
+        <label for="email">Email</label>
+        <input name="email" placeholder="your@email.com" required />
+
+        <label for="password">Password</label>
+        <input
+            type="password"
+            name="password"
+            minlength="6"
+            placeholder="At least 6 characters"
+            required
+        />
+
+        <label for="name">Your Name</label>
+        <input name="name" placeholder="Your name (required)" required />
+
+        <button type="submit">Sign Up</button>
+
+        <div style="text-align: center; margin-top: 10px">
+            <small>
+                <a href="login.html">Already have an account?</a>
+            </small>
+        </div>
     </form>
 </main>
